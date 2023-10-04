@@ -44,22 +44,12 @@ func (e *eventsGetter[T]) getEventsFromAllBlocks(from, to uint64) ([]T, error) {
 	var allEvents []T
 
 	for i := from; i <= to; i++ {
-		blockHeader, found := e.blockchain.GetHeaderByNumber(i)
-		if !found {
-			return nil, blockchain.ErrNoBlock
-		}
-
-		receipts, err := e.blockchain.GetReceiptsByHash(blockHeader.Hash)
+		events, err := e.getEvents(i)
 		if err != nil {
 			return nil, err
 		}
 
-		eventsFromBlock, err := e.getEventsFromReceipts(blockHeader, receipts)
-		if err != nil {
-			return nil, err
-		}
-
-		allEvents = append(allEvents, eventsFromBlock...)
+		allEvents = append(allEvents, events...)
 	}
 
 	return allEvents, nil
@@ -94,4 +84,25 @@ func (e *eventsGetter[T]) getEventsFromReceipts(blockHeader *types.Header,
 	}
 
 	return events, nil
+}
+
+// getEvents returns required events from given block
+// by first retrieving the block, and its receipts, and then events from receipts
+func (e *eventsGetter[T]) getEvents(blockNumber uint64) ([]T, error) {
+	blockHeader, found := e.blockchain.GetHeaderByNumber(blockNumber)
+	if !found {
+		return nil, blockchain.ErrNoBlock
+	}
+
+	receipts, err := e.blockchain.GetReceiptsByHash(blockHeader.Hash)
+	if err != nil {
+		return nil, err
+	}
+
+	eventsFromBlock, err := e.getEventsFromReceipts(blockHeader, receipts)
+	if err != nil {
+		return nil, err
+	}
+
+	return eventsFromBlock, nil
 }
