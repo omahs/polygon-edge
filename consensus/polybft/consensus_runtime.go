@@ -71,15 +71,18 @@ type guardedDataDTO struct {
 
 // runtimeConfig is a struct that holds configuration data for given consensus runtime
 type runtimeConfig struct {
-	PolyBFTConfig         *PolyBFTConfig
-	DataDir               string
-	Key                   *wallet.Key
-	State                 *State
-	blockchain            blockchainBackend
-	polybftBackend        polybftBackend
-	txPool                txPoolInterface
-	bridgeTopic           topic
-	numBlockConfirmations uint64
+	PolyBFTConfig  *PolyBFTConfig
+	DataDir        string
+	Key            *wallet.Key
+	State          *State
+	blockchain     blockchainBackend
+	polybftBackend polybftBackend
+	txPool         txPoolInterface
+	bridgeTopic    topic
+	// event tracker
+	numBlockConfirmations    uint64
+	trackerSyncBatchSize     uint64
+	trackerBlocksToReconcile uint64
 }
 
 // consensusRuntime is a struct that provides consensus runtime features like epoch, state and event management
@@ -171,15 +174,18 @@ func (c *consensusRuntime) initStateSyncManager(logger hcf.Logger) error {
 			logger.Named("state-sync-manager"),
 			c.config.State,
 			&stateSyncConfig{
-				key:                      c.config.Key,
-				stateSenderAddr:          stateSenderAddr,
-				stateSenderStartBlock:    c.config.PolyBFTConfig.Bridge.EventTrackerStartBlocks[stateSenderAddr],
-				jsonrpcAddr:              c.config.PolyBFTConfig.Bridge.JSONRPCEndpoint,
-				dataDir:                  c.config.DataDir,
-				topic:                    c.config.bridgeTopic,
-				maxCommitmentSize:        maxCommitmentSize,
+				key:                   c.config.Key,
+				stateSenderAddr:       stateSenderAddr,
+				stateSenderStartBlock: c.config.PolyBFTConfig.Bridge.EventTrackerStartBlocks[stateSenderAddr],
+				jsonrpcAddr:           c.config.PolyBFTConfig.Bridge.JSONRPCEndpoint,
+				dataDir:               c.config.DataDir,
+				topic:                 c.config.bridgeTopic,
+				maxCommitmentSize:     maxCommitmentSize,
+				// event tracker
 				numBlockConfirmations:    c.config.numBlockConfirmations,
 				blockTrackerPollInterval: c.config.PolyBFTConfig.BlockTrackerPollInterval.Duration,
+				trackerSyncBatchSize:     c.config.trackerSyncBatchSize,
+				trackerBlocksToReconcile: c.config.trackerBlocksToReconcile,
 			},
 			c,
 		)

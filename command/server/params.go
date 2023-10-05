@@ -38,8 +38,7 @@ const (
 	corsOriginFlag               = "access-control-allow-origins"
 	logFileLocationFlag          = "log-to"
 
-	relayerFlag               = "relayer"
-	numBlockConfirmationsFlag = "num-block-confirmations"
+	relayerFlag = "relayer"
 
 	concurrentRequestsDebugFlag = "concurrent-requests-debug"
 	webSocketReadLimitFlag      = "websocket-read-limit"
@@ -47,6 +46,11 @@ const (
 	relayerTrackerPollIntervalFlag = "relayer-poll-interval"
 
 	metricsIntervalFlag = "metrics-interval"
+
+	// event tracker
+	numBlockConfirmationsFlag    = "num-block-confirmations"
+	trackerSyncBatchSizeFlag     = "tracker-sync-batch-size"
+	trackerBlocksToReconcileFlag = "tracker-blocks-to-reconcile"
 )
 
 // Flags that are deprecated, but need to be preserved for
@@ -190,8 +194,11 @@ func (p *serverParams) generateConfig() *server.Config {
 		LogFilePath:        p.logFileLocation,
 
 		Relayer:                    p.relayer,
-		NumBlockConfirmations:      p.rawConfig.NumBlockConfirmations,
 		RelayerTrackerPollInterval: p.rawConfig.RelayerTrackerPollInterval,
 		MetricsInterval:            p.rawConfig.MetricsInterval,
+		// event tracker
+		NumBlockConfirmations:    p.rawConfig.NumBlockConfirmations,
+		TrackerSyncBatchSize:     p.rawConfig.TrackerSyncBatchSize,
+		TrackerBlocksToReconcile: p.rawConfig.TrackerBlocksToReconcile,
 	}
 }
