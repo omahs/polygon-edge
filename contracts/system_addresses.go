@@ -76,7 +76,7 @@ var (
 
 	// NativeTransferPrecompile is an address of native transfer precompile
 	NativeTransferPrecompile = types.StringToAddress("0x2020")
-	// BLSAggSigsVerificationPrecompile is an address of BLS aggregated signatures verificatin precompile
+	// BLSAggSigsVerificationPrecompile is an address of BLS aggregated signatures verification precompile
 	BLSAggSigsVerificationPrecompile = types.StringToAddress("0x2030")
 	// ConsolePrecompile is and address of Hardhat console precompile
 	ConsolePrecompile = types.StringToAddress("0x000000000000000000636F6e736F6c652e6c6f67")
