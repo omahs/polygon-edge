@@ -23,6 +23,8 @@ const (
 	maxParallelTxWorkers = 10
 	// maxAttemptsToSend how many sending retries for one transaction
 	maxAttemptsToSend = 6
+	// maxBlocksToWaitForResend specifies how many blocks should be wait in order to try again to send transaction
+	maxBlocksToWaitForResend = uint64(50)
 )
 
 var errFailedToExecuteStateSync = errors.New("failed to execute state sync")
@@ -182,7 +184,12 @@ func (ssr *stateSyncRelayerImpl) PostBlock(req *PostBlockRequest) error {
 }
 
 func (ssr *stateSyncRelayerImpl) processBatch() {
-	events, err := ssr.state.StateSyncStore.getAllAvailableEvents()
+	staleBlockNumber := uint64(0)
+	if bn := ssr.blockchain.CurrentHeader().Number; bn > maxBlocksToWaitForResend {
+		staleBlockNumber = bn - maxBlocksToWaitForResend
+	}
+
+	events, err := ssr.state.StateSyncStore.getAllAvailableEvents(staleBlockNumber)
 	if err != nil {
 		ssr.logger.Error("error while reading available events", "err", err)
 
